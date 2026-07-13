@@ -52,6 +52,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .stApp { background: radial-gradient(circle at top left, #edf8ef 0, #f5f7f4 300px, #f5f7f4 100%); }
 header[data-testid="stHeader"] { background: rgba(245, 247, 244, 0.84); backdrop-filter: blur(10px); }
 #MainMenu, footer, [data-testid="stDecoration"], [data-testid="stToolbar"] { visibility: hidden; height: 0; }
+/* sidebar collapse button hidden once open */
+[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] { display: none !important; }
 .block-container { max-width: 1480px; padding-top: 2rem; padding-bottom: 4rem; }
 
 .material-symbols-rounded {
@@ -218,6 +220,28 @@ h2, h3 { color: #18231d !important; font-weight: 750 !important; letter-spacing:
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ── Force sidebar open on every page load ─────────────────────────────────────
+import streamlit.components.v1 as components
+components.html("""
+<script>
+(function() {
+    // Clear any saved collapsed state for sidebar
+    Object.keys(localStorage).forEach(function(k) {
+        if (k.toLowerCase().indexOf('sidebar') !== -1) {
+            localStorage.removeItem(k);
+        }
+    });
+    // If sidebar is currently collapsed, click the expand arrow
+    function tryExpand() {
+        var btn = document.querySelector('[data-testid="collapsedControl"]');
+        if (btn) { btn.click(); }
+    }
+    setTimeout(tryExpand, 300);
+    setTimeout(tryExpand, 900);
+})();
+</script>
+""", height=0)
 
 # Premium deep emerald and slate palette
 EMERALD = ["#064e3b", "#047857", "#059669", "#10b981", "#34d399", "#0f766e", "#14b8a6", "#84cc16"]
